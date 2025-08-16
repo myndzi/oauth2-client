@@ -108,11 +108,13 @@ export class OAuth2AuthorizationCodeClient {
       this.client.getEndpoint('authorizationEndpoint')
     ]);
 
-    const query = new URLSearchParams({
-      client_id: this.client.settings.clientId,
-      response_type: 'code',
-      redirect_uri: params.redirectUri,
-    });
+    const url = new URL(authorizationEndpoint);
+
+    const query = url.searchParams;
+    query.set('client_id', this.client.settings.clientId);
+    query.set('response_type', 'code');
+    query.set('redirect_uri', params.redirectUri);
+
     if (codeChallenge) {
       query.set('code_challenge_method', codeChallenge[0]);
       query.set('code_challenge', codeChallenge[1]);
@@ -137,7 +139,7 @@ export class OAuth2AuthorizationCodeClient {
       query.set(k, v);
     }
 
-    return authorizationEndpoint + '?' + query.toString();
+    return url.toString();
 
   }
 

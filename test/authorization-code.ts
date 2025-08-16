@@ -42,6 +42,31 @@ describe('authorization-code', () => {
         server.url + '/authorize?' + params.toString()
       );
     });
+    it('should support pre-baked query params for the authorization endpoint', async () => {
+      server = testServer();
+      const client = new OAuth2Client({
+        server: server.url,
+        authorizationEndpoint: '/authorize?foo=bar',
+        clientId: 'test-client-id',
+      });
+
+      const redirectUri = 'http://my-app.example/redirect';
+
+      const params = new URLSearchParams({
+        client_id: 'test-client-id',
+        response_type: 'code',
+        redirect_uri: redirectUri,
+        scope: 'a b',
+      });
+
+      assert.equal(
+        await client.authorizationCode.getAuthorizeUri({
+          redirectUri,
+          scope: ['a', 'b'],
+        }),
+        server.url + '/authorize?foo=bar&' + params.toString()
+      );
+    });
     it('should support extraparams', async () => {
       server = testServer();
       const client = new OAuth2Client({
